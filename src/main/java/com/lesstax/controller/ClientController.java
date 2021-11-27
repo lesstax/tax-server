@@ -38,7 +38,7 @@ public class ClientController {
 	@Autowired
 	private ClientBusinessDelegate clientBusinessDelegate;
 
-	@PostMapping
+	@PostMapping("/save")
 	public Client saveClient(@RequestBody Client client) {
 		logger.info("Inside saveClient() of client controller");
 		logger.info("Exiting from saveClient() of client controller");
