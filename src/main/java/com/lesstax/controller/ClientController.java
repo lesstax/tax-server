@@ -1,26 +1,22 @@
 package com.lesstax.controller;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.List;
-import java.util.Properties;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.lesstax.businessDelegate.ClientBusinessDelegate;
-import com.lesstax.businessDelegate.SendSMS;
 import com.lesstax.model.Client;
 import com.lesstax.model.mapper.ClientModel;
 
@@ -56,61 +52,19 @@ public class ClientController {
 		return clientMapper;
 	}
 
-	@GetMapping("/hello")
-	public String helloCheck() {
-		
-		ClientBusinessDelegate clientBusinessDelegate = new ClientBusinessDelegate();
-		clientBusinessDelegate.sendOTPOnMail("");
-		SendSMS sendSMS = new SendSMS();
-		sendSMS.sendSms();
-		return "hello check";
-		/*
-		 * getGroups(); try { // Construct data String apiKey = "apikey=" +
-		 * "NGI1MDcwNTY0ODQ1NGI3MzY3NGQ1NDczNDc2NzcwNTg="; String message = "&message="
-		 * + "This is your message"; String sender = "&sender=" + "TXTLCL"; String
-		 * numbers = "&numbers=" + "+917829686356";
-		 * 
-		 * // Send data HttpURLConnection conn = (HttpURLConnection) new
-		 * URL("https://api.textlocal.in/send/?").openConnection(); String data = apiKey
-		 * + numbers + message + sender; conn.setDoOutput(true);
-		 * conn.setRequestMethod("POST"); conn.setRequestProperty("Content-Length",
-		 * Integer.toString(data.length()));
-		 * conn.getOutputStream().write(data.getBytes("UTF-8")); final BufferedReader rd
-		 * = new BufferedReader(new InputStreamReader(conn.getInputStream())); final
-		 * StringBuffer stringBuffer = new StringBuffer(); String line; while ((line =
-		 * rd.readLine()) != null) { stringBuffer.append(line); } rd.close();
-		 * 
-		 * return stringBuffer.toString(); } catch (Exception e) {
-		 * System.out.println("Error SMS "+e); return "Error "+e; }
-		 */
+	@GetMapping("/clientLogin")
+	public ClientModel clientLogin(@RequestParam String email, @RequestParam String password) throws Exception {
+		logger.info("Inside clientLogin() of client controller");
+		ClientModel clientMapper = clientBusinessDelegate.clientLogin(email, password);
+		logger.info("Exiting from clientLogin() of client controller");
+		return clientMapper;
 	}
 
-	public String getGroups() {
-		try {
-			// Construct data
-			String apiKey = "apikey=" + "NzUzOTY3N2E2ZTQzNzU3YTcyNjU1NzQ1NmE3MTM0NmE=";
-
-			// Send data
-			HttpURLConnection conn = (HttpURLConnection) new URL("https://api.textlocal.in/get_groups/?")
-					.openConnection();
-			String data = apiKey;
-			conn.setDoOutput(true);
-			conn.setRequestMethod("POST");
-			conn.setRequestProperty("Content-Length", Integer.toString(data.length()));
-			conn.getOutputStream().write(data.getBytes("UTF-8"));
-			final BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-			final StringBuffer stringBuffer = new StringBuffer();
-			String line;
-			while ((line = rd.readLine()) != null) {
-				stringBuffer.append(line);
-			}
-			rd.close();
-
-			return stringBuffer.toString();
-		} catch (Exception e) {
-			System.out.println("Error SMS " + e);
-			return "Error " + e;
-		}
+	@GetMapping("/getClientsWithPagination")
+	public List<Client> getAllEmployees(@RequestParam(defaultValue = "0") Integer pageNo,
+			@RequestParam(defaultValue = "10") Integer pageSize) {
+		List<Client> clients = clientBusinessDelegate.getAllClients(pageNo, pageSize);
+		return clients;
 	}
 
 }
