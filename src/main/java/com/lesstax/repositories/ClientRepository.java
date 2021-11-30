@@ -2,12 +2,11 @@ package com.lesstax.repositories;
 
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
 import com.lesstax.model.Client;
 
-public interface ClientRepository extends JpaRepository<Client,Long> {
+public interface ClientRepository  extends PagingAndSortingRepository<Client, Long> {
 
 	Optional<Client> findById(Long id);
 
