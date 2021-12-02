@@ -7,7 +7,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "client")
-public class Client {
+public class Client extends CommonFields {
 
 	@Id
 	@GeneratedValue
@@ -18,8 +18,11 @@ public class Client {
 	private String mobileNumber;
 	private String email;
 	private String password;
-	
-	public Client() {}
+	private Boolean isEmailVerified;
+	private String planType;
+
+	public Client() {
+	}
 
 	public Long getId() {
 		return id;
@@ -76,5 +79,21 @@ public class Client {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
+	public Boolean getIsEmailVerified() {
+		return isEmailVerified;
+	}
+
+	public void setIsEmailVerified(Boolean isEmailVerified) {
+		this.isEmailVerified = isEmailVerified;
+	}
+
+	public String getPlanType() {
+		return planType;
+	}
+
+	public void setPlanType(String planType) {
+		this.planType = planType;
+	}
+
 }

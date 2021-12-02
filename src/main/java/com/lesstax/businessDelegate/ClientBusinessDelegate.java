@@ -1,7 +1,10 @@
 package com.lesstax.businessDelegate;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,11 +16,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.lesstax.businessRepositories.ClientBusinessRepository;
-import com.lesstax.email.SendEmail;
 import com.lesstax.mapper.ClientMapper;
 import com.lesstax.model.Client;
 import com.lesstax.model.mapper.ClientModel;
 import com.lesstax.repositories.ClientRepository;
+import com.lesstax.request.model.ClientPaginationRequest;
+import com.lesstax.request.model.ClientPaginationResponse;
+import com.lesstax.service.SendEmailService;
 
 @Service
 public class ClientBusinessDelegate implements ClientBusinessRepository {
@@ -28,7 +33,7 @@ public class ClientBusinessDelegate implements ClientBusinessRepository {
 	private ClientRepository clientRepository;
 
 	@Autowired
-	private SendEmail sendEmail;
+	private SendEmailService sendEmail;
 
 	private ClientMapper mapper = Mappers.getMapper(ClientMapper.class);
 
@@ -37,17 +42,41 @@ public class ClientBusinessDelegate implements ClientBusinessRepository {
 
 		logger.info("Inside saveClient() of Client BusinessDelegate");
 
-		Client clientEmailCheck = clientRepository.findByEmail(client.getEmail());
-		if (clientEmailCheck != null) {
+		Optional<Client> clientEmailCheck = Optional.ofNullable(clientRepository.findByEmail(client.getEmail()));
+		if (clientEmailCheck.isPresent()) {
 			logger.info("Exiting from saveClient() of Client BusinessDelegate");
 			return null;
-		}
+		} else {
 
-		client = clientRepository.save(client);
-		if (client != null) {
+			client.setCreatedDate(getDateAndTime());
+			client.setCreatedBy(client.getFirstName());
+			client = clientRepository.save(client);
 			sendEmail.sendOTPOnMail(client.getEmail(), client.getFirstName());
 		}
 		logger.info("Exiting from saveClient() of Client BusinessDelegate");
+		return client;
+	}
+
+	@Override
+	public Client updateClient(Client client) {
+
+		logger.info("Inside updateClient() of Client BusinessDelegate");
+		client.setUpdateDate(getDateAndTime());
+		client.setUpdatedBy(client.getFirstName());
+		clientRepository.save(client);
+		logger.info("Exiting from updateClient() of Client BusinessDelegate");
+		return client;
+	}
+
+	@Override
+	public Client emailVerified(Client client) {
+
+		logger.info("Inside emailVerified() of Client BusinessDelegate");
+		client.setIsEmailVerified(true);
+		client.setUpdateDate(getDateAndTime());
+		client.setUpdatedBy(client.getFirstName());
+		clientRepository.save(client);
+		logger.info("Exiting from emailVerified() of Client BusinessDelegate");
 		return client;
 	}
 
@@ -83,17 +112,32 @@ public class ClientBusinessDelegate implements ClientBusinessRepository {
 	}
 
 	@Override
-	public List<Client> getAllClients(Integer pageNo, Integer pageSize) {
+	public ClientPaginationResponse getAllClients(Integer pageNo, Integer pageSize) {
 
+		logger.info("Inside getAllClients() of Client BusinessDelegate");
 		Pageable paging = PageRequest.of(pageNo, pageSize);
-
 		Page<Client> pagedResult = clientRepository.findAll(paging);
 
 		if (pagedResult.hasContent()) {
-			return pagedResult.getContent();
+			logger.info("Exiting from getAllClients() of Client BusinessDelegate");
+			ClientPaginationResponse paginationResponse = new ClientPaginationResponse(pagedResult.getContent(),
+					pagedResult.getTotalPages(),pagedResult.getNumber(),pagedResult.getSize());
+			return paginationResponse;
 		} else {
-			return new ArrayList<Client>();
+			logger.info("Exiting from getAllClients() of Client BusinessDelegate");
+			return new ClientPaginationResponse();
 		}
 	}
 
+	public Client findClientByEmail(String clientEmailId) {
+		logger.info("Inside findClientByEmail() of Client BusinessDelegate");
+		logger.info("Exiting from findClientByEmail() of Client BusinessDelegate");
+		return clientRepository.findByEmail(clientEmailId);
+
+	}
+
+	public Date getDateAndTime() {
+		Date date = java.util.Calendar.getInstance().getTime();
+		return date;
+	}
 }
