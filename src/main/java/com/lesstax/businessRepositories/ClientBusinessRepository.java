@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.lesstax.model.Client;
 import com.lesstax.model.mapper.ClientModel;
+import com.lesstax.request.model.ClientPaginationResponse;
 
 public interface ClientBusinessRepository {
 
@@ -15,6 +16,10 @@ public interface ClientBusinessRepository {
 	
 	public ClientModel clientLogin(String email, String password);
 	
-	public List<Client> getAllClients(Integer pageNo, Integer pageSize) ;
+	public ClientPaginationResponse getAllClients(Integer pageNo, Integer pageSize) ;
+
+	public Client updateClient(Client client);
+
+	public Client emailVerified(Client client);
 	
 }

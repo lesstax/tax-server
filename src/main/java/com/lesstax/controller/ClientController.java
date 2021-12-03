@@ -5,20 +5,25 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.lesstax.businessDelegate.ClientBusinessDelegate;
+import com.lesstax.exception.LessTaxException;
 import com.lesstax.model.Client;
 import com.lesstax.model.mapper.ClientModel;
+import com.lesstax.repositories.ClientService;
+import com.lesstax.request.model.ClientPaginationRequest;
+import com.lesstax.request.model.ClientPaginationResponse;
+import com.lesstax.request.model.ClientPaginationWithFIlter;
+import com.lesstax.request.model.ClientSignIn;
+import com.lesstax.request.model.OTPModel;
+import com.lesstax.service.SendOTPService;
 
 @CrossOrigin
 @RestController
@@ -30,10 +35,16 @@ public class ClientController {
 	@Autowired
 	private ClientBusinessDelegate clientBusinessDelegate;
 
-	@PostMapping("/save")
-	public Client saveClient(@RequestBody Client client) {
-		logger.info("Inside saveClient() of client controller");
-		logger.info("Exiting from saveClient() of client controller");
+	@Autowired
+	private SendOTPService sendOTPService;
+
+	@Autowired
+	private ClientService clientService;
+
+	@PostMapping("/signup")
+	public Client signUp(@RequestBody Client client) throws LessTaxException {
+		logger.info("Inside signUp() of client controller");
+		logger.info("Exiting from signUp() of client controller");
 		return clientBusinessDelegate.saveClient(client);
 	}
 
@@ -52,19 +63,49 @@ public class ClientController {
 		return clientMapper;
 	}
 
-	@GetMapping("/clientLogin")
-	public ClientModel clientLogin(@RequestParam String email, @RequestParam String password) throws Exception {
-		logger.info("Inside clientLogin() of client controller");
-		ClientModel clientMapper = clientBusinessDelegate.clientLogin(email, password);
-		logger.info("Exiting from clientLogin() of client controller");
+	@PostMapping("/signin")
+	public ClientModel signIn(@RequestBody ClientSignIn clientSignIn) throws Exception {
+		logger.info("Inside signIn() of client controller");
+		ClientModel clientMapper = clientBusinessDelegate.clientLogin(clientSignIn.getEmailId(),
+				clientSignIn.getPassword());
+		logger.info("Exiting from signIn() of client controller");
 		return clientMapper;
 	}
 
-	@GetMapping("/getClientsWithPagination")
-	public List<Client> getAllEmployees(@RequestParam(defaultValue = "0") Integer pageNo,
-			@RequestParam(defaultValue = "10") Integer pageSize) {
-		List<Client> clients = clientBusinessDelegate.getAllClients(pageNo, pageSize);
+	@PostMapping("/getClientsWithPagination")
+	public ClientPaginationResponse getClientsWithPagination(@RequestBody ClientPaginationRequest paginationRequest) {
+		logger.info("Inside getClientsWithPagination() of client controller");
+		ClientPaginationResponse clients = clientBusinessDelegate.getAllClients(paginationRequest.getPageNo(),
+				paginationRequest.getPageSize());
+		logger.info("Exiting from getClientsWithPagination() of client controller");
 		return clients;
+	}
+
+	@PostMapping("/getClientsWithPaginationAndFilter")
+	public Page<Client> getClientsWithPaginationAndFilter(
+			@RequestBody ClientPaginationWithFIlter clientPaginationWithFIlter) {
+		logger.info("Inside getClientsWithPaginationAndFilter() of client controller");
+		logger.info("Exiting from getClientsWithPaginationAndFilter() of client controller");
+		return clientService.getClients(clientPaginationWithFIlter.getClientPage(),
+				clientPaginationWithFIlter.getClientSearchCriteria());
+	}
+
+	@PostMapping("/verifyOtp")
+	public Client verifyOtp(@RequestBody OTPModel otpModel) throws Exception {
+		logger.info("Inside verifyOtp() of client controller");
+
+		Integer storedOtp = sendOTPService.getOtp(otpModel.getClientEmail());
+		if (otpModel.getOtp() == storedOtp) {
+			Client client = clientBusinessDelegate.findClientByEmail(otpModel.getClientEmail());
+			if (client != null) {
+				return clientBusinessDelegate.emailVerified(client);
+			}
+		} else {
+			logger.info("Exiting from verifyOtp() of client controller");
+			return null;
+		}
+		logger.info("Exiting from verifyOtp() of client controller");
+		return null;
 	}
 
 }
