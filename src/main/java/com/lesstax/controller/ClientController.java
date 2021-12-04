@@ -21,6 +21,7 @@ import com.lesstax.model.ClientEntity;
 import com.lesstax.model.mapper.ClientModel;
 import com.lesstax.repositories.ClientCriteriaRepository;
 import com.lesstax.repositories.ClientService;
+import com.lesstax.request.model.ClientPage;
 import com.lesstax.request.model.ClientPaginationRequest;
 import com.lesstax.request.model.ClientPaginationResponse;
 import com.lesstax.request.model.ClientPaginationWithFIlter;
@@ -115,9 +116,9 @@ public class ClientController {
 	}
 	
 	@PostMapping("/getAll")
-	public List<ClientEntity> getAll(@RequestBody ClientPaginationRequest paginationRequest) {
+	public Page<ClientEntity> getAll(@RequestBody ClientPage clientPage) {
 		logger.info("Inside getClientsWithPagination() of client controller");
-		List<ClientEntity> clients = clientCriteriaRepository.getAllClients(paginationRequest.getPageNo(), paginationRequest.getPageSize());
+		Page<ClientEntity> clients = clientCriteriaRepository.getAllClients(clientPage);
 		logger.info("Exiting from getClientsWithPagination() of client controller");
 		return clients;
 	}

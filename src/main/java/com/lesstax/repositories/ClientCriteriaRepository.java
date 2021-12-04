@@ -20,7 +20,6 @@ import org.springframework.stereotype.Repository;
 
 import com.lesstax.model.ClientEntity;
 import com.lesstax.request.model.ClientPage;
-import com.lesstax.request.model.ClientPaginationResponse;
 import com.lesstax.request.model.ClientSearchCriteria;
 
 @Repository
@@ -34,24 +33,22 @@ public class ClientCriteriaRepository {
 		this.criteriaBuilder = entityManager.getCriteriaBuilder();
 	}
 
-	public List<ClientEntity> getAllClients(Integer pageNo, Integer pageSize) {
+	public Page<ClientEntity> getAllClients(ClientPage clientPage) {
 
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-	    CriteriaQuery<ClientEntity> criteriaQuery = criteriaBuilder.createQuery(ClientEntity.class);
-	    Root<ClientEntity> root = criteriaQuery.from(ClientEntity.class);
-	    List<Predicate> predicates = new ArrayList<Predicate>();
-       // predicates.add(criteriaBuilder.equal(root.get("isEmailVerified"), true));
-        //criteriaQuery.where(criteriaBuilder.and(predicates.toArray( new Predicate[predicates.size()])));
-	    criteriaQuery.select(root);
+		CriteriaQuery<ClientEntity> criteriaQuery = criteriaBuilder.createQuery(ClientEntity.class);
+		Root<ClientEntity> root = criteriaQuery.from(ClientEntity.class);
+		Predicate predicate = criteriaBuilder.equal(root.get("isEmailVerified"), true);
+		criteriaQuery.where(predicate);
+		TypedQuery<ClientEntity> typedQuery = entityManager.createQuery(criteriaQuery);
+		typedQuery.setFirstResult(clientPage.getPageNumber() * clientPage.getPageSize());
+		typedQuery.setMaxResults(clientPage.getPageSize());
 
-	    List<ClientEntity> result =
-	        entityManager
-	            .createQuery(criteriaQuery)
-	            .setMaxResults(pageNo)
-	            .setFirstResult(pageSize)
-	            .getResultList();
+		Pageable pageable = getPageable(clientPage);
 
-	    return result;
+		long ClientsCount = getClientsCount(predicate);
+
+		return new PageImpl<>(typedQuery.getResultList(), pageable, ClientsCount);
 
 	}
 
@@ -59,7 +56,13 @@ public class ClientCriteriaRepository {
 		CriteriaQuery<ClientEntity> criteriaQuery = criteriaBuilder.createQuery(ClientEntity.class);
 		Root<ClientEntity> ClientRoot = criteriaQuery.from(ClientEntity.class);
 		Predicate predicate = getPredicate(ClientSearchCriteria, ClientRoot);
-		criteriaQuery.where(predicate);
+
+		List<Predicate> predicates = new ArrayList<Predicate>();
+
+		predicates.add(getPredicate(ClientSearchCriteria, ClientRoot));
+		predicates.add(criteriaBuilder.equal(ClientRoot.get("isEmailVerified"), true));
+
+		criteriaQuery.select(ClientRoot).where(predicates.toArray(new Predicate[] {}));
 		setOrder(clientPage, criteriaQuery, ClientRoot);
 
 		TypedQuery<ClientEntity> typedQuery = entityManager.createQuery(criteriaQuery);
