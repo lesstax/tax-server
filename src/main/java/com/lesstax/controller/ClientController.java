@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.integration.IntegrationProperties.RSocket.Client;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,10 +14,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.lesstax.businessDelegate.ClientBusinessDelegate;
 import com.lesstax.exception.LessTaxException;
-import com.lesstax.model.Client;
+import com.lesstax.model.ClientEntity;
 import com.lesstax.model.mapper.ClientModel;
+import com.lesstax.repositories.ClientCriteriaRepository;
 import com.lesstax.repositories.ClientService;
 import com.lesstax.request.model.ClientPaginationRequest;
 import com.lesstax.request.model.ClientPaginationResponse;
@@ -40,16 +43,19 @@ public class ClientController {
 
 	@Autowired
 	private ClientService clientService;
+	
+	@Autowired
+	private ClientCriteriaRepository clientCriteriaRepository;
 
 	@PostMapping("/signup")
-	public Client signUp(@RequestBody Client client) throws LessTaxException {
+	public ClientModel signUp(@RequestBody ClientModel clientModel) throws LessTaxException {
 		logger.info("Inside signUp() of client controller");
 		logger.info("Exiting from signUp() of client controller");
-		return clientBusinessDelegate.saveClient(client);
+		return clientBusinessDelegate.saveClient(clientModel);
 	}
 
 	@GetMapping
-	public List<Client> getAllClients() {
+	public List<ClientModel> getAllClients() {
 		logger.info("Inside getAllClients() of client controller");
 		logger.info("Exiting from getAllClients() of client controller");
 		return clientBusinessDelegate.getAllClient();
@@ -82,7 +88,7 @@ public class ClientController {
 	}
 
 	@PostMapping("/getClientsWithPaginationAndFilter")
-	public Page<Client> getClientsWithPaginationAndFilter(
+	public Page<ClientEntity> getClientsWithPaginationAndFilter(
 			@RequestBody ClientPaginationWithFIlter clientPaginationWithFIlter) {
 		logger.info("Inside getClientsWithPaginationAndFilter() of client controller");
 		logger.info("Exiting from getClientsWithPaginationAndFilter() of client controller");
@@ -91,14 +97,14 @@ public class ClientController {
 	}
 
 	@PostMapping("/verifyOtp")
-	public Client verifyOtp(@RequestBody OTPModel otpModel) throws Exception {
+	public ClientModel verifyOtp(@RequestBody OTPModel otpModel) throws Exception {
 		logger.info("Inside verifyOtp() of client controller");
 
 		Integer storedOtp = sendOTPService.getOtp(otpModel.getClientEmail());
-		if (otpModel.getOtp() == storedOtp) {
-			Client client = clientBusinessDelegate.findClientByEmail(otpModel.getClientEmail());
-			if (client != null) {
-				return clientBusinessDelegate.emailVerified(client);
+		if (otpModel.getOtp().intValue() == storedOtp.intValue()) {
+			ClientModel clientModel = clientBusinessDelegate.findClientByEmail(otpModel.getClientEmail());
+			if (clientModel != null) {
+				return clientBusinessDelegate.emailVerified(clientModel);
 			}
 		} else {
 			logger.info("Exiting from verifyOtp() of client controller");
@@ -106,6 +112,21 @@ public class ClientController {
 		}
 		logger.info("Exiting from verifyOtp() of client controller");
 		return null;
+	}
+	
+	@PostMapping("/getAll")
+	public List<ClientEntity> getAll(@RequestBody ClientPaginationRequest paginationRequest) {
+		logger.info("Inside getClientsWithPagination() of client controller");
+		List<ClientEntity> clients = clientCriteriaRepository.getAllClients(paginationRequest.getPageNo(), paginationRequest.getPageSize());
+		logger.info("Exiting from getClientsWithPagination() of client controller");
+		return clients;
+	}
+	
+	@GetMapping("/removeClient/{id}")
+	public Boolean removeClient(@PathVariable Long id) {
+		logger.info("Inside removeClient() of client controller");
+		logger.info("Exiting from removeClient() of client controller");
+		return clientBusinessDelegate.removeClient(id);
 	}
 
 }

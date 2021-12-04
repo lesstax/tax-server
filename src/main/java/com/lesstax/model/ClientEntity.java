@@ -1,13 +1,17 @@
 package com.lesstax.model;
 
+import java.time.LocalDateTime;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "client")
-public class Client extends CommonFields {
+public class ClientEntity extends CommonFields {
 
 	@Id
 	@GeneratedValue
@@ -19,9 +23,15 @@ public class Client extends CommonFields {
 	private String email;
 	private String password;
 	private Boolean isEmailVerified;
-	private String planType;
+	private LocalDateTime expiryDate;
 
-	public Client() {
+	@OneToOne (cascade=CascadeType.ALL)
+	private RoleEntity role;
+
+	@OneToOne (cascade=CascadeType.ALL)
+	private PlanEntity plan;
+
+	public ClientEntity() {
 	}
 
 	public Long getId() {
@@ -88,12 +98,28 @@ public class Client extends CommonFields {
 		this.isEmailVerified = isEmailVerified;
 	}
 
-	public String getPlanType() {
-		return planType;
+	public RoleEntity getRole() {
+		return role;
 	}
 
-	public void setPlanType(String planType) {
-		this.planType = planType;
+	public void setRole(RoleEntity role) {
+		this.role = role;
+	}
+
+	public PlanEntity getPlan() {
+		return plan;
+	}
+
+	public void setPlan(PlanEntity plan) {
+		this.plan = plan;
+	}
+
+	public LocalDateTime getExpiryDate() {
+		return expiryDate;
+	}
+
+	public void setExpiryDate(LocalDateTime expiryDate) {
+		this.expiryDate = expiryDate;
 	}
 
 }

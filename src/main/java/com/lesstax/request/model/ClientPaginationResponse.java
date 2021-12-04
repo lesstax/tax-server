@@ -2,11 +2,11 @@ package com.lesstax.request.model;
 
 import java.util.List;
 
-import com.lesstax.model.Client;
+import com.lesstax.model.ClientEntity;
 
 public class ClientPaginationResponse {
 
-	private List<Client> client;
+	private List<ClientEntity> client;
 	private Integer totalNumberOfPages;
 	private Integer currentPage;
 	private Integer pageSize;
@@ -14,7 +14,7 @@ public class ClientPaginationResponse {
 	public ClientPaginationResponse() {
 	}
 
-	public ClientPaginationResponse(List<Client> client, Integer totalNumberOfPages, Integer currentPage, Integer pageSize) {
+	public ClientPaginationResponse(List<ClientEntity> client, Integer totalNumberOfPages, Integer currentPage, Integer pageSize) {
 		super();
 		this.client = client;
 		this.totalNumberOfPages = totalNumberOfPages;
@@ -22,11 +22,11 @@ public class ClientPaginationResponse {
 		this.pageSize = pageSize;
 	}
 
-	public List<Client> getClient() {
+	public List<ClientEntity> getClient() {
 		return client;
 	}
 
-	public void setClient(List<Client> client) {
+	public void setClient(List<ClientEntity> client) {
 		this.client = client;
 	}
 
