@@ -1,19 +1,29 @@
 package com.lesstax.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
+import javax.persistence.MappedSuperclass;
+
+import org.hibernate.annotations.CreationTimestamp;
+
+@MappedSuperclass
 public class CommonFields {
 
-	private Date createdDate;
+	@CreationTimestamp
+	private LocalDateTime createdDate;
+
 	private String createdBy;
-	private Date updateDate;
+
+	@CreationTimestamp
+	private LocalDateTime updateDate;
+
 	private String updatedBy;
 
-	public Date getCreatedDate() {
+	public LocalDateTime getCreatedDate() {
 		return createdDate;
 	}
 
-	public void setCreatedDate(Date createdDate) {
+	public void setCreatedDate(LocalDateTime createdDate) {
 		this.createdDate = createdDate;
 	}
 
@@ -25,11 +35,11 @@ public class CommonFields {
 		this.createdBy = createdBy;
 	}
 
-	public Date getUpdateDate() {
+	public LocalDateTime getUpdateDate() {
 		return updateDate;
 	}
 
-	public void setUpdateDate(Date updateDate) {
+	public void setUpdateDate(LocalDateTime updateDate) {
 		this.updateDate = updateDate;
 	}
 

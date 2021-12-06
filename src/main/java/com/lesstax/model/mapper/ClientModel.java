@@ -1,15 +1,45 @@
 package com.lesstax.model.mapper;
 
+import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.lesstax.model.PlanEntity;
+import com.lesstax.model.RoleEntity;
+
 public class ClientModel {
 
+	@JsonProperty("id")
 	private Long id;
+
+	@JsonProperty("first-name")
 	private String firstName;
+
+	@JsonProperty("middle-name")
 	private String middleName;
+
+	@JsonProperty("last-name")
 	private String lastName;
+
+	@JsonProperty("mobile-number")
 	private String mobileNumber;
+
+	@JsonProperty("email")
 	private String email;
+
+	@JsonProperty("password")
+	private String password;
+
+	@JsonProperty("is-email-verified")
+	private Boolean isEmailVerified;
+
+	@JsonProperty("expiry-date")
+	private LocalDateTime expiryDate;
 	
-	public ClientModel() {}
+	@JsonProperty("role")
+	private RoleEntity role;
+
+	@JsonProperty("plan")
+	private PlanEntity plan;
 
 	public Long getId() {
 		return id;
@@ -58,5 +88,29 @@ public class ClientModel {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public Boolean getIsEmailVerified() {
+		return isEmailVerified;
+	}
+
+	public void setIsEmailVerified(Boolean isEmailVerified) {
+		this.isEmailVerified = isEmailVerified;
+	}
+
+	public LocalDateTime getExpiryDate() {
+		return expiryDate;
+	}
+
+	public void setExpiryDate(LocalDateTime expiryDate) {
+		this.expiryDate = expiryDate;
+	}
+
 }

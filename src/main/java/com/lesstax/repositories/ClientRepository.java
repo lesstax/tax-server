@@ -4,11 +4,11 @@ import java.util.Optional;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import com.lesstax.model.Client;
+import com.lesstax.model.ClientEntity;
 
-public interface ClientRepository  extends PagingAndSortingRepository<Client, Long> {
+public interface ClientRepository  extends PagingAndSortingRepository<ClientEntity, Long> {
 
-	Optional<Client> findById(Long id);
+	Optional<ClientEntity> findById(Long id);
 
-	 Client findByEmail(String email);
+	 ClientEntity findByEmail(String email);
 }
