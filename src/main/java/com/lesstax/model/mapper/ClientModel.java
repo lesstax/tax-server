@@ -34,12 +34,15 @@ public class ClientModel {
 
 	@JsonProperty("expiry-date")
 	private LocalDateTime expiryDate;
-	
+
 	@JsonProperty("role")
 	private RoleEntity role;
 
 	@JsonProperty("plan")
 	private PlanEntity plan;
+
+	@JsonProperty("is-gorgot-password-status")
+	private Boolean isForgotPasswordStatus;
 
 	public Long getId() {
 		return id;
@@ -111,6 +114,30 @@ public class ClientModel {
 
 	public void setExpiryDate(LocalDateTime expiryDate) {
 		this.expiryDate = expiryDate;
+	}
+
+	public RoleEntity getRole() {
+		return role;
+	}
+
+	public void setRole(RoleEntity role) {
+		this.role = role;
+	}
+
+	public PlanEntity getPlan() {
+		return plan;
+	}
+
+	public void setPlan(PlanEntity plan) {
+		this.plan = plan;
+	}
+
+	public Boolean getIsForgotPasswordStatus() {
+		return isForgotPasswordStatus;
+	}
+
+	public void setIsForgotPasswordStatus(Boolean isForgotPasswordStatus) {
+		this.isForgotPasswordStatus = isForgotPasswordStatus;
 	}
 
 }

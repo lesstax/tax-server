@@ -65,6 +65,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 						"/client/signin","/client/getClientsWithPagination","/client/verifyOtp",
 						"/client/getAll","/client/{id}",
 						"/client/removeClient/{id}",
+						"/client/",
+						"/client/resetPassword",
+						"/client/forgotPassword",
 						"/client/getClientsWithPagination", "/client/getClientsWithPaginationAndFilter").permitAll().
 //// all other requests need to be authenticated
 				anyRequest().authenticated().and().

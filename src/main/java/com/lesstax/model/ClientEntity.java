@@ -24,11 +24,12 @@ public class ClientEntity extends CommonFields {
 	private String password;
 	private Boolean isEmailVerified;
 	private LocalDateTime expiryDate;
+	private Boolean isForgotPasswordStatus;
 
-	@OneToOne (cascade=CascadeType.ALL)
+	@OneToOne(cascade = CascadeType.ALL)
 	private RoleEntity role;
 
-	@OneToOne (cascade=CascadeType.ALL)
+	@OneToOne(cascade = CascadeType.ALL)
 	private PlanEntity plan;
 
 	public ClientEntity() {
@@ -120,6 +121,14 @@ public class ClientEntity extends CommonFields {
 
 	public void setExpiryDate(LocalDateTime expiryDate) {
 		this.expiryDate = expiryDate;
+	}
+
+	public Boolean getIsForgotPasswordStatus() {
+		return isForgotPasswordStatus;
+	}
+
+	public void setIsForgotPasswordStatus(Boolean isForgotPasswordStatus) {
+		this.isForgotPasswordStatus = isForgotPasswordStatus;
 	}
 
 }
