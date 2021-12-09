@@ -1,28 +1,27 @@
 package com.lesstax.businessRepositories;
 
-import java.util.List;
-
-import com.lesstax.model.ClientEntity;
+import com.lesstax.exception.BusinessException;
 import com.lesstax.model.mapper.ClientModel;
-import com.lesstax.request.model.ClientPaginationResponse;
+import com.lesstax.request.response.model.ClientResponse;
 
 public interface ClientBusinessRepository {
 
-	public ClientModel saveClient(ClientModel clientModel);
+	public ClientResponse saveClient(ClientModel clientModel);
 
-	public ClientModel findClient(Long id) throws Exception;
+	public ClientResponse findClientById(Long id) throws BusinessException, Exception;
 
-	public List<ClientModel> getAllClient();
+	public ClientResponse getAllClient();
 	
-	public ClientModel clientLogin(String email, String password);
+	public ClientResponse clientLogin(String email, String password);
 	
-	public ClientPaginationResponse getAllClients(Integer pageNo, Integer pageSize) ;
+	public ClientResponse getAllClients(Integer pageNo, Integer pageSize) ;
 
-	public ClientModel updateClient(ClientModel clientModel);
+	public ClientResponse updateClient(ClientModel clientModel);
 
-	public ClientModel emailVerified(ClientModel clientModel);
+	public ClientResponse emailVerified(ClientModel clientModel);
 
 	public Boolean removeClient(Long id);
 
+	public ClientModel findClientByEmail(String clientEmailId);
 	
 }

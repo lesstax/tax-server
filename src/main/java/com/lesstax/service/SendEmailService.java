@@ -49,7 +49,7 @@ public class SendEmailService {
 
 	private LoadingCache<String, String> otpCache;
 
-	public Boolean sendOTPOnMail(String clientMailId, String clientName) {
+	public Boolean sendOTPOnMail(String clientMailId, String clientName, String sendingPurpose) {
 
 		logger.info("Inside sendOTPOnMail() of SendOTP ");
 		Properties prop = new Properties();
@@ -72,7 +72,12 @@ public class SendEmailService {
 			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(clientMailId));
 			message.setSubject("For Email Verification");
 			Integer otp = sendOTPService.generateOTP(clientMailId);
-			message.setText("Dear " + clientName + "," + "\n\n Your OTP is:- " + otp + "\n\n Regards, \n LessTax");
+			if (sendingPurpose.equals("OTP")) {
+				message.setText("Dear " + clientName + "," + "\n\n Your OTP is:- " + otp + "\n\n Regards, \n LessTax");
+			} else {
+				message.setText(
+						"Hello Dear " + "," + "\n\n Your New Password is:- " + otp + "\n\n Regards, \n LessTax");
+			}
 
 			Transport.send(message);
 

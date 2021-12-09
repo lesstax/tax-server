@@ -19,8 +19,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import com.lesstax.model.ClientEntity;
-import com.lesstax.request.model.ClientPage;
-import com.lesstax.request.model.ClientSearchCriteria;
+import com.lesstax.request.response.model.ClientPage;
+import com.lesstax.request.response.model.ClientSearchCriteria;
 
 @Repository
 public class ClientCriteriaRepository {
@@ -45,9 +45,7 @@ public class ClientCriteriaRepository {
 		typedQuery.setMaxResults(clientPage.getPageSize());
 
 		Pageable pageable = getPageable(clientPage);
-
 		long ClientsCount = getClientsCount(predicate);
-
 		return new PageImpl<>(typedQuery.getResultList(), pageable, ClientsCount);
 
 	}
