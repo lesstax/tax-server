@@ -42,7 +42,7 @@ public class ClientModel {
 	private PlanEntity plan;
 
 	@JsonProperty("is-gorgot-password-status")
-	private Boolean isForgotPasswordStatus;
+	private Boolean isForgotPasswordStatus=false;
 
 	public Long getId() {
 		return id;

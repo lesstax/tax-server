@@ -46,22 +46,17 @@ public class ClientBusinessDelegate implements ClientBusinessRepository {
 
 	@Override
 	public ClientResponse saveClient(ClientModel clientModel) throws BusinessException {
-
 		logger.info("Inside saveClient() of Client BusinessDelegate");
 		ClientEntity client = mapper.clientModelToClient(clientModel);
-		if (Optional.ofNullable(clientRepository.findByEmail(client.getEmail())).isPresent()) {
-			return new ClientResponse(null,
-					new BusinessException(Arrays.asList(new ErrorVO("01", "Client Already found with this email id"))),
-					HttpStatus.FOUND);
+		if (clientRepository.findByEmail(client.getEmail()).isPresent()) {
+			throw new BusinessException(Arrays.asList(new ErrorVO("01", "Client Already found with this email id")));
 		} else {
-
 			client.setCreatedBy(clientModel.getFirstName());
 			client.setPassword(BusinessUtility.cryptWithMD5(client.getPassword()));
 			client = clientRepository.save(client);
 			sendEmail.sendOTPOnMail(client.getEmail(), client.getFirstName(),"OTP");
+			return new ClientResponse(mapper.clientToClientModel(client), null, HttpStatus.OK);
 		}
-		logger.info("Exiting from saveClient() of Client BusinessDelegate");
-		return new ClientResponse(mapper.clientToClientModel(client), null, HttpStatus.OK);
 	}
 
 	@Override
@@ -109,25 +104,21 @@ public class ClientBusinessDelegate implements ClientBusinessRepository {
 	public ClientResponse clientLogin(String email, String password) throws BusinessException {
 
 		logger.info("Inside clientLogin() of Client BusinessDelegate");
-		ClientEntity client = clientRepository.findByEmail(email);
-
-		if (client != null && client.getIsForgotPasswordStatus() == true) {
+		Optional<ClientEntity> client = clientRepository.findByEmail(email);
+		if(client.isPresent() && client.get().getIsForgotPasswordStatus() == true){
 			logger.info("Exiting from clientLogin() of Client BusinessDelegate");
-			return new ClientResponse(null,
-					new BusinessException(Arrays.asList(new ErrorVO("05", "Please reset your passowrd"))),
-					HttpStatus.OK);
+			throw new BusinessException(Arrays.asList(new ErrorVO("05", "Please reset your passowrd")));
+		}else {
+			password = BusinessUtility.cryptWithMD5(password);
+			if (client.isPresent() && null != client.get().getPassword() && client.get().getPassword().equals(password)) {
+				logger.info("Exiting from clientLogin() of Client BusinessDelegate");
+				return new ClientResponse(mapper.clientToClientModel(client.get()), null, HttpStatus.OK);
+			} else{
+				throw  new BusinessException(Arrays.asList(new ErrorVO("02", "Your email id or password is incorreect")));
+			}
 		}
-		
-		password = BusinessUtility.cryptWithMD5(password);
-		if (client != null && client.getPassword() != null && client.getPassword().equals(password)) {
-			logger.info("Exiting from clientLogin() of Client BusinessDelegate");
-			return new ClientResponse(mapper.clientToClientModel(client), null, HttpStatus.OK);
-		}
-		logger.info("Exiting from clientLogin() of Client BusinessDelegate");
-		return new ClientResponse(null,
-				new BusinessException(Arrays.asList(new ErrorVO("02", "Your email id or password is incorreect"))),
-				HttpStatus.OK);
 	}
+
 
 	@Override
 	public ClientResponse getAllClients(Integer pageNo, Integer pageSize) throws BusinessException {
@@ -152,7 +143,7 @@ public class ClientBusinessDelegate implements ClientBusinessRepository {
 
 		logger.info("Inside findClientByEmail() of Client BusinessDelegate");
 		logger.info("Exiting from findClientByEmail() of Client BusinessDelegate");
-		return mapper.clientToClientModel(clientRepository.findByEmail(clientEmailId));
+		return mapper.clientToClientModel(clientRepository.findByEmail(clientEmailId).get());
 
 	}
 
@@ -165,33 +156,26 @@ public class ClientBusinessDelegate implements ClientBusinessRepository {
 		return true;
 	}
 
-	public ClientResponse sendTemporaryPassword(String clientEmailId) {
-		
+	public ClientResponse sendTemporaryPassword(String clientEmailId) throws BusinessException {
 		logger.info("Inside sendTemporaryPassword() of Client BusinessDelegate");
-		ClientEntity client = clientRepository.findByEmail(clientEmailId);
-		if (Optional.ofNullable(client).isEmpty()) {
-			return new ClientResponse(null,
-					new BusinessException(Arrays.asList(new ErrorVO("04", "No Client found with this email id"))),
-					HttpStatus.FOUND);
-		}
-		
+		Optional<ClientEntity> client = clientRepository.findByEmail(clientEmailId);
+		client.orElseThrow(()-> new BusinessException(Arrays.asList(new ErrorVO("04", "No Client found with this email id"))));
 		sendEmail.sendOTPOnMail(clientEmailId, null,"password");
 		Integer storedOtp = sendOTPService.getOtp(clientEmailId);
 		String password = Integer.toString(storedOtp);
-		client.setPassword(BusinessUtility.cryptWithMD5(password));
-		client.setIsForgotPasswordStatus(true);
-		client = clientRepository.save(client);
+		client.get().setPassword(BusinessUtility.cryptWithMD5(password));
+		client.get().setIsForgotPasswordStatus(true);
+		client = Optional.of(clientRepository.save(client.get()));
 		logger.info("Exiting from sendTemporaryPassword() of Client BusinessDeleg");
-		return new ClientResponse(mapper.clientToClientModel(clientRepository.save(client)), null, HttpStatus.OK);
+		return new ClientResponse(mapper.clientToClientModel(client.get()), null, HttpStatus.OK);
 	}
 
 	public ClientResponse updatePassword(ResetPasswordRequest resetPasswordRequest) {
-		
 		logger.info("Inside updatePassword() of Client BusinessDelegate");
-		ClientEntity client = clientRepository.findByEmail(resetPasswordRequest.getEmailId());
-		client.setPassword(BusinessUtility.cryptWithMD5(resetPasswordRequest.getPassword()));
-		client.setIsForgotPasswordStatus(false);
+		Optional<ClientEntity> client = clientRepository.findByEmail(resetPasswordRequest.getEmailId());
+		client.get().setPassword(BusinessUtility.cryptWithMD5(resetPasswordRequest.getPassword()));
+		client.get().setIsForgotPasswordStatus(false);
 		logger.info("Exiting from updatePassword() of Client BusinessDeleg");
-		return new ClientResponse(mapper.clientToClientModel(clientRepository.save(client)), null, HttpStatus.OK);
+		return new ClientResponse(mapper.clientToClientModel(clientRepository.save(client.get())), null, HttpStatus.OK);
 	}
 }

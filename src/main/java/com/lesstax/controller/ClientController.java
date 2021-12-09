@@ -78,7 +78,7 @@ public class ClientController {
 	}
 
 	@PostMapping("/signin")
-	public ClientResponse signIn(@RequestBody ClientSignIn clientSignIn) throws Exception {
+	public ClientResponse signIn(@RequestBody ClientSignIn clientSignIn) throws BusinessException {
 
 		logger.info("Inside signIn() of client controller");
 		logger.info("Exiting from signIn() of client controller");

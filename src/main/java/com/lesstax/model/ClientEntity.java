@@ -1,13 +1,10 @@
 package com.lesstax.model;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import java.time.LocalDateTime;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "client")
@@ -24,7 +21,7 @@ public class ClientEntity extends CommonFields {
 	private String password;
 	private Boolean isEmailVerified;
 	private LocalDateTime expiryDate;
-	private Boolean isForgotPasswordStatus;
+	private Boolean isForgotPasswordStatus=false;
 
 	@OneToOne(cascade = CascadeType.ALL)
 	private RoleEntity role;

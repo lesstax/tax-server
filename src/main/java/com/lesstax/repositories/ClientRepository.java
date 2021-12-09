@@ -9,6 +9,5 @@ import com.lesstax.model.ClientEntity;
 public interface ClientRepository  extends PagingAndSortingRepository<ClientEntity, Long> {
 
 	Optional<ClientEntity> findById(Long id);
-
-	 ClientEntity findByEmail(String email);
+	Optional<ClientEntity>  findByEmail(String email);
 }
