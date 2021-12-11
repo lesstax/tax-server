@@ -1,13 +1,13 @@
 package com.lesstax.repositories;
 
-import java.util.Optional;
-
+import com.lesstax.entity.ClientEntity;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import com.lesstax.model.ClientEntity;
+import java.util.Optional;
 
-public interface ClientRepository  extends PagingAndSortingRepository<ClientEntity, Long> {
+public interface ClientRepository extends PagingAndSortingRepository<ClientEntity, Long> {
 
-	Optional<ClientEntity> findById(Long id);
-	Optional<ClientEntity>  findByEmail(String email);
+    Optional<ClientEntity> findById(Long id);
+
+    Optional<ClientEntity> findByEmail(String email);
 }

@@ -1,17 +1,19 @@
 package com.lesstax.mapper;
 
-import java.util.List;
-
+import com.lesstax.entity.ClientEntity;
+import com.lesstax.model.ClientModel;
 import org.mapstruct.Mapper;
 
-import com.lesstax.model.ClientEntity;
-import com.lesstax.model.mapper.ClientModel;
+import java.util.List;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface ClientMapper {
-	
-	 ClientModel clientToClientModel(ClientEntity client);
-	 ClientEntity clientModelToClient(ClientModel clientMapper);
-	 List<ClientModel> clientToClientModelList(List<ClientEntity> clients);
-	 List<ClientEntity> clientModelToClientList(List<ClientModel> clientModels);
+
+    ClientModel clientToClientModel(ClientEntity client);
+
+    ClientEntity clientModelToClient(ClientModel clientMapper);
+    
+    List<ClientEntity> clientModelToClientList(List<ClientModel> clientModels);
+
+    List<ClientModel> constructClientModels(List<ClientEntity> clientModels);
 }

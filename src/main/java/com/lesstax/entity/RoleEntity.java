@@ -1,4 +1,4 @@
-package com.lesstax.model;
+package com.lesstax.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -6,13 +6,13 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "plan")
-public class PlanEntity {
+@Table(name = "role")
+public class RoleEntity {
 
 	@Id
 	@GeneratedValue
 	private Long id;
-	private String planType;
+	private String roleName;
 
 	public Long getId() {
 		return id;
@@ -22,12 +22,12 @@ public class PlanEntity {
 		this.id = id;
 	}
 
-	public String getPlanType() {
-		return planType;
+	public String getRoleName() {
+		return roleName;
 	}
 
-	public void setPlanType(String planType) {
-		this.planType = planType;
+	public void setRoleName(String roleName) {
+		this.roleName = roleName;
 	}
 
 }
